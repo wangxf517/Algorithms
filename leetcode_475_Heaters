@@ -1,0 +1,27 @@
+class Solution {
+    public int findRadius(int[] houses, int[] heaters) {
+        Arrays.sort(houses);
+        Arrays.sort(heaters);
+        int radius = 0;
+        int frontHeaterIndex = -1;
+        int backHeaterIndex = 0;
+        for (int housePosition:houses) {
+            while (backHeaterIndex < heaters.length && housePosition > heaters[backHeaterIndex]) {
+                    frontHeaterIndex++;
+                    backHeaterIndex++;
+            }
+            if (frontHeaterIndex <= -1) {
+                radius = Math.max(radius, Math.abs(housePosition - heaters[backHeaterIndex]));
+            }
+            else if (backHeaterIndex >= heaters.length) {
+                radius = Math.max(radius, Math.abs(housePosition - heaters[frontHeaterIndex]));
+            }
+            else {
+                int distanceToFrontHeater = Math.abs(housePosition - heaters[frontHeaterIndex]);
+                int distanceToBackHeater = Math.abs(housePosition - heaters[backHeaterIndex]);
+                radius = Math.max(radius, Math.min(distanceToFrontHeater, distanceToBackHeater));
+            }
+        }
+        return radius;
+    }
+}
