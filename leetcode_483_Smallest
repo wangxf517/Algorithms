@@ -1,0 +1,36 @@
+class Solution {
+    public String smallestGoodBase(String s) {
+            long n = Long.parseLong(s);
+            long best = n - 1;
+    out:    for (int digits = 3; digits < 64; digits++) {
+            
+                double d = Math.pow(n - 1, 1.0/(digits - 1));
+                
+    in:         for (long base = (long) d + 1; base >= 2; base--) {
+                    long sum = Long.MAX_VALUE;
+                    long[] powers = new long[digits];
+                    powers[0] = 1;
+                    sum = 1;
+                    for (int i = 1; i < digits; i++) {
+                        powers[i] = powers[i - 1] * base;
+                        if (powers[i] < 0) {
+                            continue in;
+                        }
+                        sum += powers[i];
+                    }
+                    
+                    if (sum > n && base == 2) {
+                        break out;
+                    }
+                    if (sum == n) {
+                        best = base;
+                        break;
+                    }
+                    if (sum < n) {
+                        break;
+                    }
+                }
+            }
+            return Long.toString(best);
+        }
+}
