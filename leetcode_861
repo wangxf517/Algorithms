@@ -1,0 +1,19 @@
+class Solution {
+    public int matrixScore(int[][] A) {
+        int R = A.length, C = A[0].length;
+        int[] column = new int[C];
+        for(int c = 1; c < C; c++) {
+            for(int r = 0; r < R; r++) {
+                A[r][c] = (A[r][c]^A[r][0]) == 1 ? 0 : 1;
+                column[c] += A[r][c];
+            }
+        }
+        
+        int maxScore = R * (1 << C-1);
+        for(int c = 1; c < C; c++) {
+            maxScore += Math.max(column[c], R-column[c]) * (1 << C-1-c);
+        }
+        
+        return maxScore;
+    }
+}
