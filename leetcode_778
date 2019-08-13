@@ -1,0 +1,145 @@
+//Binary Search + DFS
+class Solution {
+    
+    
+    private int[][] d = {{0,1},{0,-1},{-1,0},{1,0}};
+    
+    public int swimInWater(int[][] grid) {
+        int N = grid.length;
+        int n = N * N;
+        
+        int low = 0;
+        int high = 0;
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid.length; j++) {
+                high = Math.max(grid[i][j], high);
+            }
+        }
+        
+        while(low < high) {
+            int mid = (high - low)/2 + low;
+            int[] used = new int[n];
+            if (isValid(0, 0, mid, grid, used)) {
+                high = mid;
+            } else {
+                low = mid + 1;
+            }
+        }
+        
+        return low;
+    }
+    
+    private boolean isValid(int i, int j, int time, int[][] grid, int[] used) {
+        if (i < 0 || i > grid.length - 1 || j < 0 || j > grid.length - 1 || used[i*grid.length+j] == 1 || grid[i][j] > time) return false;
+        
+        used[i*grid.length+j] = 1;
+        if (i == grid.length - 1 && j == grid.length - 1 && grid[i][j] <= time) return true;
+        
+        for (int[] dd:d) {
+            if (isValid(i+dd[0], j+dd[1], time, grid, used)) return true;
+        }
+        
+        return false;
+    }
+}
+
+
+//Union Find
+class Solution {
+    
+    private static class UnionFind {
+        
+        private int[] id;
+        
+        public UnionFind(int num) {
+            id = new int[num];
+            for (int i = 0; i < num; i++) {
+                id[i] = i;
+            }
+        }
+        
+        public int root(int i) {
+            while (i != id[i]) {
+                i = id[i];
+            }
+            
+            return i;
+        }
+        
+        public boolean isConnected(int p, int q) {
+            int pId = root(p);
+            int qId = root(q);
+            
+            if (pId == qId) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        
+        public void connect(int p, int q) {
+            int pId = root(p);
+            int qId = root(q);
+            
+            if (pId == qId) return;
+            
+            for (int i = 0; i < id.length; i++) {
+                if (id[i] == qId) id[i] = pId;
+            }
+        }
+        
+    }
+    
+    public int swimInWater(int[][] grid) {
+        int[][] d = {{0,1},{0,-1},{-1,0},{1,0}};
+        
+        int N = grid.length;
+        int n = N * N;
+        
+        int time = -1;
+        UnionFind uf = new UnionFind(n);
+        while(!uf.isConnected(0, n-1)) {
+            time++;
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < N; j++) {
+                    if (grid[i][j] > time) continue;
+                    if (i < N-1 && grid[i+1][j] <= time) uf.connect(i*N+j, (i+1)*N+j);
+                    if (j < N-1 && grid[i][j+1] <= time) uf.connect(i*N+j, i*N+j+1);
+                }
+            }
+        }
+        return time;
+    }
+}
+
+// Dynamic programming
+class Solution {
+    
+    private int[][] d = {{0,1},{0,-1},{1,0},{-1,0}};
+    
+    public int swimInWater(int[][] grid) {
+        int N = grid.length;
+        int[][] dp = new int[N][N];
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                dp[i][j] = Integer.MAX_VALUE;
+            }
+        }
+        
+        dfs(0,0,grid[0][0],grid,dp);
+        
+        return dp[N-1][N-1];
+    }
+    
+    private void dfs(int i, int j, int current, int[][] grid, int[][] dp) {
+        if (i > grid.length-1 || j > grid.length-1 || i < 0 || j < 0) return;
+        if (Math.max(current, grid[i][j]) < dp[i][j]) {
+            dp[i][j] = Math.max(current, grid[i][j]);
+        } else {
+            return;
+        }
+        for(int[] dd : d) {
+            dfs(i+dd[0], j+dd[1], dp[i][j], grid, dp);
+        }
+    }
+}
